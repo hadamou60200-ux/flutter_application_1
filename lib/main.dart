@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'ride.dart';
+import 'ride_card.dart';
 
 void main() {
   runApp(const MyApp());
@@ -172,6 +174,27 @@ class AccueilPage extends StatelessWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 16),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: mockRides.length,
+              itemBuilder: (context, index) {
+                final ride = mockRides[index];
+                return RideCard(
+                  ride: ride,
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Trajet sélectionné : ${ride.departureCity} - ${ride.arrivalCity}',
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
                       ],
                     ),
                   ),
