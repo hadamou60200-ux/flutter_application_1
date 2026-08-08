@@ -1,27 +1,17 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const SenRideApp());
+  runApp(const MyApp());
 }
 
-class SenRideApp extends StatelessWidget {
-  const SenRideApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SenRide',
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFF1F5F9), // Fond gris clair de la maquette
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF16A34A), // Vert SenRide
-          primary: const Color(0xFF16A34A),
-          secondary: const Color(0xFFFF8C00), // Orange SenRide
-        ),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
+      home: HomeScreen(),
     );
   }
 }
@@ -36,199 +26,268 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
+  final List<Widget> _pages = [
+    const AccueilPage(),
+    const Center(child: Text('Mes Trajets')),
+    const Center(child: Text('Messages')),
+    const ProfilePage(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black87),
-          onPressed: () {},
-        ),
-        title: const Text(
-          'Accueil',
-          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        centerTitle: true,
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined, color: Colors.black87),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '3',
-                    style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Salutation
-            const Text(
-              'Bonjour 👋',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Où allez-vous aujourd\'hui ?',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
-
-            // Carte de recherche de trajet
-            Card(
-              elevation: 0,
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    // Ville de départ
-                    Row(
-                      children: const [
-                        Icon(Icons.circle, color: Color(0xFF16A34A), size: 14),
-                        SizedBox(width: 12),
-                        Text('Dakar, Sénégal', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-                      ],
-                    ),
-                    const Divider(height: 24),
-
-                    // Ville d'arrivée
-                    Row(
-                      children: const [
-                        Icon(Icons.location_on, color: Color(0xFFFF8C00), size: 18),
-                        SizedBox(width: 12),
-                        Text('Thiès, Sénégal', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-                      ],
-                    ),
-                    const Divider(height: 24),
-
-                    // Date & Passagers
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: const [
-                              Icon(Icons.calendar_today_outlined, size: 18, color: Colors.grey),
-                              SizedBox(width: 8),
-                              Text('24 Mai 2024', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                            ],
-                          ),
-                        ),
-                        Container(height: 20, width: 1, color: Colors.grey.shade300),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: const [
-                              Icon(Icons.person_outline, size: 18, color: Colors.grey),
-                              SizedBox(width: 8),
-                              Text('2 passagers', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Bouton "Rechercher un trajet"
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF16A34A),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: () {},
-                        icon: const Icon(Icons.search, color: Colors.white),
-                        label: const Text(
-                          'Rechercher un trajet',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Bannière promotionnelle
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF7ED),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFFFEDD5)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Voyagez ensemble,',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF9A3412)),
-                        ),
-                        Text(
-                          'économisez davantage',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF9A3412)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.directions_car_filled_sharp, color: Color(0xFFFF8C00), size: 40),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-
-      // Barre de navigation inférieure
+      body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        selectedItemColor: const Color(0xFF16A34A),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Accueil'),
-          BottomNavigationBarItem(icon: Icon(Icons.directions_car_outlined), label: 'Mes trajets'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: 'Messages'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profil'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
+          BottomNavigationBarItem(icon: Icon(Icons.directions_car), label: 'Mes trajets'),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 1. ÉCRAN D'ACCUEIL
+// ---------------------------------------------------------------------------
+class AccueilPage extends StatelessWidget {
+  const AccueilPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // En-tête vert avec message de bienvenue
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20.0),
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  ),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bonjour 👋',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Où allez-vous aujourd\'hui ?',
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Carte de recherche de trajet
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Card(
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        const TextField(
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.location_on, color: Colors.green),
+                            hintText: 'Départ (ex: Dakar)',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                        const Divider(),
+                        const TextField(
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.flag, color: Colors.orange),
+                            hintText: 'Arrivée (ex: Thiès)',
+                            border: InputBorder.none,
+                          ),
+                        ),
+                        const Divider(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.calendar_today, color: Colors.grey),
+                                  hintText: DateTime.now().toString().split(' ')[0],
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            const Expanded(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(Icons.person, color: Colors.grey),
+                                  hintText: '1 passager',
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: const Text(
+                              'Rechercher un trajet',
+                              style: TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 2. ÉCRAN PROFIL (AVEC PLUSIEURS OPTIONS)
+// ---------------------------------------------------------------------------
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profil'),
+        backgroundColor: Colors.green,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          // En-tête profil utilisateur
+          const Row(
+            children: [
+              CircleAvatar(
+                radius: 35,
+                backgroundColor: Colors.green,
+                child: Icon(Icons.person, size: 40, color: Colors.white),
+              ),
+              SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Utilisateur',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Mon compte',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              )
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Divider(),
+
+          // Section : Informations
+          _buildOptionTile(
+            icon: Icons.badge,
+            iconColor: Colors.blue,
+            title: 'Vérification d\'identité (CNI / Photo)',
+            onTap: () {},
+          ),
+          _buildOptionTile(
+            icon: Icons.history,
+            iconColor: Colors.purple,
+            title: 'Historique des trajets',
+            onTap: () {},
+          ),
+          _buildOptionTile(
+            icon: Icons.payment,
+            iconColor: Colors.orange,
+            title: 'Moyens de paiement (Wave, Orange Money)',
+            onTap: () {},
+          ),
+          _buildOptionTile(
+            icon: Icons.settings,
+            iconColor: Colors.grey,
+            title: 'Paramètres',
+            onTap: () {},
+          ),
+
+          const Divider(),
+          const SizedBox(height: 10),
+
+          // Déconnexion
+          _buildOptionTile(
+            icon: Icons.logout,
+            iconColor: Colors.red,
+            title: 'Se déconnecter',
+            textColor: Colors.red,
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget utilitaire pour construire chaque ligne d'option proprement
+  Widget _buildOptionTile({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required VoidCallback onTap,
+    Color textColor = Colors.black,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        leading: Icon(icon, color: iconColor),
+        title: Text(
+          title,
+          style: TextStyle(color: textColor, fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        onTap: onTap,
       ),
     );
   }
