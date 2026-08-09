@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+<key>NSCameraUsageDescription</key>
+<string>Nous avons besoin d'acceder à votre caméra pour scanner votre pièce d'identité et prendre votre selfie.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Nous avons besoin d'accéder à vos photos pour selectionner votre pièce d'identité.</string>	
 </dict>
 </plist>
