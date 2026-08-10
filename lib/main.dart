@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/accueil_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+  
+  runApp(const SenRideApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SenRideApp extends StatelessWidget {
+  const SenRideApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Senride',
+      title: 'SenRide',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Senride est connecté à Firebase avec succès !'),
-        ),
-      ),
+      home: const AccueilPage(),
     );
   }
 }

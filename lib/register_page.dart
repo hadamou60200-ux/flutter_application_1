@@ -21,91 +21,93 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final ImagePicker _picker = ImagePicker();
 
-  // Fonction pour sélectionner une image (Galerie ou Caméra)
-  Future<void> _pickImage(bool isIdCard) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+  // Sélectionner la pièce d'identité depuis la galerie
+  Future<void> _pickIdImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       setState(() {
-        if (isIdCard) {
-          _idImage = image;
-        } else {
-          _selfieImage = image;
-        }
+        _idImage = pickedFile;
       });
     }
   }
 
-  // Fonction principale d'envoi vers Firebase avec gestion des erreurs
+  // Sélectionner le selfie depuis la galerie (pour l'émulateur)
+  Future<void> _pickSelfieImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selfieImage = pickedFile;
+      });
+    }
+  }
+
+  // Fonction d'envoi sécurisée vers Firebase Storage et Firestore
   Future<void> _submitToFirebase() async {
-    // 1. Vérification des champs et des images
     if (_adresseController.text.isEmpty || _idImage == null || _selfieImage == null) {
-      print("DEBUG: Blocage -> Adresse vide: ${_adresseController.text.isEmpty}, Image ID nulle: ${_idImage == null}, Selfie nul: ${_selfieImage == null}");
-      
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir l\'adresse et sélectionner les deux images')),
+        const SnackBar(content: Text('Veuillez remplir l\'adresse et sélectionner les deux images.')),
       );
-      return; 
+      return;
     }
 
-    // 2. Activation du chargement
     setState(() {
       _isLoading = true;
     });
 
     try {
-      print("DEBUG: Début de l'envoi vers Firebase Storage...");
-
-      // Nom unique basé sur le temps actuel
+      print("DEBUG: Début de la préparation des images...");
       String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
 
+      // 1. Conversion sécurisée de l'image ID en fichier temporaire local valide
+      final idBytes = await _idImage!.readAsBytes();
+      final tempDir = await Directory.systemTemp.createTemp();
+      final idTempFile = File('${tempDir.path}/id_$timestamp.jpg');
+      await idTempFile.writeAsBytes(idBytes);
+
+      // 2. Conversion sécurisée du selfie en fichier temporaire local valide
+      final selfieBytes = await _selfieImage!.readAsBytes();
+      final selfieTempFile = File('${tempDir.path}/selfie_$timestamp.jpg');
+      await selfieTempFile.writeAsBytes(selfieBytes);
+
+      print("DEBUG: Début de l'envoi vers Firebase Storage...");
+
       // Upload de la carte d'identité
-      Reference idRef = FirebaseStorage.instance.ref().child('kyc_images/id_$timestamp.jpg');
-      await idRef.putFile(File(_idImage!.path));
-      String idUrl = await idRef.getDownloadURL();
+      TaskSnapshot idUploadTask = await FirebaseStorage.instance
+          .ref()
+          .child('kyc_images/id_$timestamp.jpg')
+          .putFile(idTempFile);
+      String idUrl = await idUploadTask.ref.getDownloadURL();
 
       // Upload du selfie
-      Reference selfieRef = FirebaseStorage.instance.ref().child('kyc_images/selfie_$timestamp.jpg');
-      await selfieRef.putFile(File(_selfieImage!.path));
-      String selfieUrl = await selfieRef.getDownloadURL();
+      TaskSnapshot selfieUploadTask = await FirebaseStorage.instance
+          .ref()
+          .child('kyc_images/selfie_$timestamp.jpg')
+          .putFile(selfieTempFile);
+      String selfieUrl = await selfieUploadTask.ref.getDownloadURL();
 
-      print("DEBUG: Images uploadées avec succès. Enregistrement Firestore...");
+      print("DEBUG: Images uploadées avec succès !");
 
-      // Enregistrement des métadonnées dans Cloud Firestore
-      await FirebaseFirestore.instance.collection('users_kyc').add({
-        'adresse': _adresseController.text.trim(),
+      // Enregistrement des données dans Firestore
+      await FirebaseFirestore.instance.collection('users').add({
+        'adresse': _adresseController.text,
         'idCardUrl': idUrl,
         'selfieUrl': selfieUrl,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      print("DEBUG: Inscription et KYC validés avec succès !");
-      
-      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Inscription validée avec succès !')),
       );
 
-      // Réinitialisation du formulaire après succès
-      _adresseController.clear();
-      setState(() {
-        _idImage = null;
-        _selfieImage = null;
-      });
-
     } catch (e) {
-      print("DEBUG ERREUR FIREBASE: $e");
-      
-      if (!mounted) return;
+      print("DEBUG ERREUR FIREBASE : $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur : $e')),
       );
     } finally {
-      // Désactive l'indicateur de chargement
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -116,15 +118,12 @@ class _RegisterPageState extends State<RegisterPage> {
         title: const Text('Inscription KYC SenRide'),
         backgroundColor: Colors.green,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
+        child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Champ Adresse
-              TextFormField(
+              TextField(
                 controller: _adresseController,
                 decoration: const InputDecoration(
                   labelText: 'Adresse au Sénégal',
@@ -132,46 +131,33 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Bouton sélection Pièce d'identité
               ElevatedButton.icon(
-                onPressed: () => _pickImage(true),
+                onPressed: _pickIdImage,
                 icon: const Icon(Icons.credit_card),
-                label: Text(_idImage == null ? 'Sélectionner la Pièce d\'identité' : 'Pièce sélectionnée ✓'),
+                label: Text(_idImage == null ? 'Sélectionner la pièce' : 'Pièce sélectionnée ✓'),
               ),
+              const SizedBox(height: 10),
               if (_idImage != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Image.file(File(_idImage!.path), height: 100),
-                ),
+                Image.file(File(_idImage!.path), height: 100),
               const SizedBox(height: 20),
-
-              // Bouton sélection Selfie
               ElevatedButton.icon(
-                onPressed: () => _pickImage(false),
+                onPressed: _pickSelfieImage,
                 icon: const Icon(Icons.camera_alt),
-                label: Text(_selfieImage == null ? 'Sélectionner le Selfie' : 'Selfie sélectionné ✓'),
+                label: Text(_selfieImage == null ? 'Sélectionner le selfie' : 'Selfie sélectionné ✓'),
               ),
+              const SizedBox(height: 10),
               if (_selfieImage != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Image.file(File(_selfieImage!.path), height: 100),
-                ),
+                Image.file(File(_selfieImage!.path), height: 100),
               const SizedBox(height: 30),
-
-              // Bouton de validation final
               _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const CircularProgressIndicator()
                   : ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        minimumSize: const Size.fromHeight(50),
                       ),
                       onPressed: _submitToFirebase,
-                      child: const Text(
-                        'Valider l\'inscription',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
+                      child: const Text('Valider l\'inscription', style: TextStyle(color: Colors.white)),
                     ),
             ],
           ),
