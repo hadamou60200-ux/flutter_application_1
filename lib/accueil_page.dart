@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'register_page.dart'; // Importation de ta page d'inscription KYC
+import 'register_page.dart'; // Importation de votre page d'inscription KYC
 
 class AccueilPage extends StatelessWidget {
   const AccueilPage({super.key});

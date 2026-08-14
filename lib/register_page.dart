@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'main_navigation.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -94,10 +95,19 @@ class _RegisterPageState extends State<RegisterPage> {
         'selfieUrl': selfieUrl,
         'createdAt': FieldValue.serverTimestamp(),
       });
-
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Inscription validée avec succès !')),
+  const SnackBar(content: Text('Inscription validée avec succès !')),
+);
+if (!mounted) return; 
+
+ Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      print("DEBUG : Tentative de navigation vers MainNavigation");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainNavigation()),
       );
+    });
 
     } catch (e) {
       print("DEBUG ERREUR FIREBASE : $e");
