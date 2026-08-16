@@ -107,6 +107,15 @@ if (mounted) {
           builder: (context) => const MainNavigation(),
         ),
       );
+      await FirebaseAuth.instance.signInAnonymously();
+ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(content: Text('Inscription validée avec succès !')),
+);
+
+if (mounted) {
+  // On renvoie 'true' à la page d'accueil pour cacher le bouton et on ferme la page d'inscription
+  Navigator.pop(context, true);
+}
     }
 
     } catch (e) {

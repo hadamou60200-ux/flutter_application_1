@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'accueil_page.dart';
 import 'register_page.dart';
+import 'package:flutter_application_1/main_navigation.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -18,7 +19,7 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.hasData) {
-          return const AccueilPage();
+          return const MainNavigation();
         }
 
         return const RegisterPage();

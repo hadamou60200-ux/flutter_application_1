@@ -1,0 +1,256 @@
+import 'package:flutter/material.dart';
+import 'resultats_screen.dart';
+
+class AccueilScreen extends StatelessWidget {
+  const AccueilScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF16A34A),
+        elevation: 0,
+        title: const Text(
+          'Accueil',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Icon(Icons.notifications, color: Colors.white, size: 28),
+                Positioned(
+                  top: 10,
+                  right: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Text(
+                      '3',
+                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Salutation
+            const Text(
+              'Bonjour 👋',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Où allez-vous aujourd\'hui ?',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 20),
+
+            // Carte de recherche principale
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Champ Départ
+                  TextField(
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.location_on, color: Color(0xFF16A34A)),
+                      hintText: 'Dakar, Sénégal',
+                      hintStyle: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+                      filled: true,
+                      fillColor: const Color(0xFFF1F5F9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Champ Arrivée
+                  TextField(
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.location_on, color: Colors.redAccent),
+                      hintText: 'Thiès, Sénégal',
+                      hintStyle: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+                      filled: true,
+                      fillColor: const Color(0xFFF1F5F9),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Date et Passagers
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.calendar_today, size: 18, color: Colors.grey),
+                              SizedBox(width: 8),
+                              Text('24 Mai 2024', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.person, size: 18, color: Colors.grey),
+                              SizedBox(width: 8),
+                              Text('2 passagers', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Bouton Rechercher un trajet
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ResultatsScreen()),
+      );
+    },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF16A34A),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
+                      ),
+                      icon: const Icon(Icons.search, color: Colors.white),
+                      label: const Text(
+                        'Rechercher un trajet',
+                        style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Bannière publicitaire "Voyagez ensemble..."
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF6FF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Voyagez ensemble,\néconomisez davantage !',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Trouvez des conducteurs vérifiés près de chez vous.',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.directions_car, size: 50, color: Color(0xFF16A34A)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Petits boutons d'accès rapide (Trajets sûrs, Paiements, etc.)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                _QuickFeatureItem(icon: Icons.security, label: 'Trajets sûrs'),
+                _QuickFeatureItem(icon: Icons.payment, label: 'Paiements'),
+                _QuickFeatureItem(icon: Icons.verified_user, label: 'Confiance'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Widget utilitaire pour les icônes du bas
+class _QuickFeatureItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _QuickFeatureItem({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(icon, color: const Color(0xFF16A34A), size: 24),
+        ),
+        const SizedBox(height: 6),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.black87)),
+      ],
+    );
+  }
+}

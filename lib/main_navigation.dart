@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'accueil_page.dart';// Pour importer AccueilPage (si elle est définie dans main.dart)
 import 'mes_trajets_page.dart'; // Pour importer ta page de trajets
 import 'profil_page.dart';
 import 'message_page.dart';
+import 'package:flutter_application_1/accueil_screen.dart';
 // Importe tes fichiers d'écrans ici (ex: accueil, mes_trajets, messages, profil)
 
 class MainNavigation extends StatefulWidget {
@@ -17,7 +17,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   // Liste de tes écrans principaux
   final List<Widget> _pages = [
-    const AccueilPage(), // Ton écran d'accueil actuel
+    const AccueilScreen(),
     const MesTrajetsPage(), // Ton fichier mes_trajets_page.dart visible dans tes onglets VS Code
     const MessagesPage(),
     const ProfilPage(), // À remplacer par ton écran de profil
