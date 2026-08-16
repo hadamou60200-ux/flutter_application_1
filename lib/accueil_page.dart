@@ -8,7 +8,7 @@ class AccueilPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Bienvenue sur SenRide"),
+        title: const Text('Bienvenue sur SenRide'),
         backgroundColor: Colors.green,
       ),
       body: Center(
@@ -24,7 +24,7 @@ class AccueilPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               const Text(
-                "Votre solution de covoiturage au meilleur prix",
+                'Votre solution de covoiturage au meilleur prix',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -32,8 +32,6 @@ class AccueilPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-              
-              // Bouton pour tester l'inscription sécurisée (KYC)
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
