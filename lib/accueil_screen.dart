@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'resultats_screen.dart';
+import 'publish_trip_screen.dart';
 
 class AccueilScreen extends StatelessWidget {
   const AccueilScreen({super.key});
@@ -59,7 +60,61 @@ class AccueilScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Carte de recherche principale
+            // Choix du rôle : Chercher ou Proposer
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ResultatsScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF16A34A),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    icon: const Icon(Icons.search, color: Colors.white, size: 20),
+                    label: const Text(
+                      'Chercher',
+                      style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PublishTripScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    icon: const Icon(Icons.directions_car, color: Colors.white, size: 20),
+                    label: const Text(
+                      'Proposer',
+                      style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Carte de recherche principale avec Départ et Arrivée
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -79,10 +134,10 @@ class AccueilScreen extends StatelessWidget {
                   TextField(
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.location_on, color: Color(0xFF16A34A)),
-                      hintText: 'Dakar, Sénégal',
+                      hintText: 'Départ (ex: Dakar)',
                       hintStyle: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
                       filled: true,
-                      fillColor: const Color(0xFFF1F5F9),
+                      fillColor: const Color(0xFFFF1F5F9),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -90,14 +145,15 @@ class AccueilScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // Champ Arrivée
+                  
+                  // Champ Arrivée (Ajouté ici)
                   TextField(
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.location_on, color: Colors.redAccent),
-                      hintText: 'Thiès, Sénégal',
+                      prefixIcon: const Icon(Icons.flag, color: Colors.blueAccent),
+                      hintText: 'Arrivée (ex: Thiès, Saint-Louis...)',
                       hintStyle: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
                       filled: true,
-                      fillColor: const Color(0xFFF1F5F9),
+                      fillColor: const Color(0xFFFF1F5F9),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
@@ -105,6 +161,7 @@ class AccueilScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  
                   // Date et Passagers
                   Row(
                     children: [
@@ -112,7 +169,7 @@ class AccueilScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
+                            color: const Color(0xFFFF1F5F9),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: const Row(
@@ -129,7 +186,7 @@ class AccueilScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
+                            color: const Color(0xFFFF1F5F9),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: const Row(
@@ -145,17 +202,17 @@ class AccueilScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // Bouton Rechercher un trajet
+                  // Bouton Rechercher un trajet détaillé
                   SizedBox(
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ResultatsScreen()),
-      );
-    },
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ResultatsScreen()),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF16A34A),
                         shape: RoundedRectangleBorder(
@@ -175,11 +232,11 @@ class AccueilScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Bannière publicitaire "Voyagez ensemble..."
+            // Bannière publicitaire
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
+                color: const Color(0xFFFFEFF6FF),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -189,8 +246,8 @@ class AccueilScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         Text(
-                          'Voyagez ensemble,\néconomisez davantage !',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
+                          'Voyagez ensemble, économisez davantage !',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
                         ),
                         SizedBox(height: 6),
                         Text(
@@ -206,10 +263,10 @@ class AccueilScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Petits boutons d'accès rapide (Trajets sûrs, Paiements, etc.)
-            Row(
+            // Petits boutons d'accès rapide du bas
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
+              children: [
                 _QuickFeatureItem(icon: Icons.security, label: 'Trajets sûrs'),
                 _QuickFeatureItem(icon: Icons.payment, label: 'Paiements'),
                 _QuickFeatureItem(icon: Icons.verified_user, label: 'Confiance'),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'ride_detail_page.dart'; // Import de la page de détails
 
 class ResultatsScreen extends StatelessWidget {
   const ResultatsScreen({super.key});
@@ -31,7 +32,7 @@ class ResultatsScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
-                    'Dakar ➔ Thiès',
+                    'Dakar → Thiès',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -53,7 +54,7 @@ class ResultatsScreen extends StatelessWidget {
                 _TrajetCard(
                   nom: 'Mamadou D.',
                   note: '4.8 (125)',
-                  trajet: 'Dakar ➔ Thiès',
+                  trajet: 'Dakar → Thiès',
                   voiture: 'Toyota RAV4',
                   places: '3 places restantes',
                   prix: '2 500 FCFA',
@@ -62,7 +63,7 @@ class ResultatsScreen extends StatelessWidget {
                 _TrajetCard(
                   nom: 'Fatou Ndoye',
                   note: '4.6 (98)',
-                  trajet: 'Dakar ➔ Thiès',
+                  trajet: 'Dakar → Thiès',
                   voiture: 'Hyundai Tucson',
                   places: '2 places restantes',
                   prix: '2 500 FCFA',
@@ -71,7 +72,7 @@ class ResultatsScreen extends StatelessWidget {
                 _TrajetCard(
                   nom: 'Ibrahima S.',
                   note: '4.9 (210)',
-                  trajet: 'Dakar ➔ Thiès',
+                  trajet: 'Dakar → Thiès',
                   voiture: 'Peugeot 3008',
                   places: '4 places restantes',
                   prix: '2 500 FCFA',
@@ -105,76 +106,114 @@ class _TrajetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return InkWell(
+      onTap: () {
+        // Navigation vers la page de détails au clic sur la carte
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RideDetailPage(
+              rideData: {
+                'depart': trajet.split('→')[0].trim(),
+                'arrivee': trajet.split('→')[1].trim(),
+                'prix': prix,
+                'conducteur': nom,
+                'telephone': '221770000000',
+              },
+            ),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                backgroundColor: Color(0xFFE2E8F0),
-                child: Icon(Icons.person, color: Colors.grey),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(nom, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 16),
-                      const SizedBox(width: 4),
-                      Text(note, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Divider(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(trajet, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                  const SizedBox(height: 4),
-                  Text('$voiture • $places', style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(prix, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF16A34A))),
-                  const SizedBox(height: 6),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF16A34A),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      elevation: 0,
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Ligne du haut : Infos conducteur & Note
+            Row(
+              children: [
+                const CircleAvatar(
+                  backgroundColor: Color(0xFFFE2E8F0),
+                  child: Icon(Icons.person, color: Colors.grey),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(nom, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Row(
+                      children: [
+                        const Icon(Icons.star, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text(note, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                      ],
                     ),
-                    child: const Text('Réserver', style: TextStyle(color: Colors.white, fontSize: 12)),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                  ],
+                ),
+              ],
+            ),
+            const Divider(height: 20),
+            
+            // Ligne du milieu : Trajet et Voiture
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(trajet, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    const SizedBox(height: 4),
+                    Text('$voiture • $places', style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(prix, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF16A34A))),
+                    const SizedBox(height: 6),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Action de réservation directe ou redirection détails
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RideDetailPage(
+                              rideData: {
+                                'depart': trajet.split('→')[0].trim(),
+                                'arrivee': trajet.split('→')[1].trim(),
+                                'prix': prix,
+                                'conducteur': nom,
+                                'telephone': '221770000000',
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF16A34A),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        elevation: 0,
+                      ),
+                      child: const Text('Réserver', style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
