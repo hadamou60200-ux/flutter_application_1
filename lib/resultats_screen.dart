@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'ride_detail_page.dart'; // Import de la page de détails
 
 class ResultatsScreen extends StatelessWidget {
-  const ResultatsScreen({super.key});
+  final String villeDepart;
+  final String villeArrivee;
+
+  // On permet de passer les villes recherchées (avec des valeurs par défaut au cas où)
+  const ResultatsScreen({
+    super.key,
+    this.villeDepart = 'Dakar',
+    this.villeArrivee = 'Thiès',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -10,36 +18,38 @@ class ResultatsScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF16A34A),
-        title: const Text(
-          'Résultats',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          '$villeDepart → $villeArrivee',
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [
-          // Barre de filtre haut (Trajet Dakar -> Thiès)
+          // Barre de filtre haut dynamique
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.white,
             child: Row(
               children: [
                 Chip(
-                  label: const Text('Tous'),
+                  label: const Text('Disponibles'),
                   backgroundColor: const Color(0xFF16A34A),
                   labelStyle: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Dakar → Thiès',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    '$villeDepart → $villeArrivee',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.filter_list),
-                  onPressed: () {},
+                  onPressed: () {
+                    // Optionnel : Action pour les filtres futurs
+                  },
                 ),
               ],
             ),
@@ -50,29 +60,29 @@ class ResultatsScreen extends StatelessWidget {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(16),
-              children: const [
+              children: [
                 _TrajetCard(
                   nom: 'Mamadou D.',
                   note: '4.8 (125)',
-                  trajet: 'Dakar → Thiès',
+                  trajet: '$villeDepart → $villeArrivee',
                   voiture: 'Toyota RAV4',
                   places: '3 places restantes',
                   prix: '2 500 FCFA',
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 _TrajetCard(
                   nom: 'Fatou Ndoye',
                   note: '4.6 (98)',
-                  trajet: 'Dakar → Thiès',
+                  trajet: '$villeDepart → $villeArrivee',
                   voiture: 'Hyundai Tucson',
                   places: '2 places restantes',
                   prix: '2 500 FCFA',
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 _TrajetCard(
                   nom: 'Ibrahima S.',
                   note: '4.9 (210)',
-                  trajet: 'Dakar → Thiès',
+                  trajet: '$villeDepart → $villeArrivee',
                   voiture: 'Peugeot 3008',
                   places: '4 places restantes',
                   prix: '2 500 FCFA',
@@ -144,7 +154,7 @@ class _TrajetCard extends StatelessWidget {
             Row(
               children: [
                 const CircleAvatar(
-                  backgroundColor: Color(0xFFFE2E8F0),
+                  backgroundColor: Color(0xFFE2E8F0), // Correction de la couleur
                   child: Icon(Icons.person, color: Colors.grey),
                 ),
                 const SizedBox(width: 12),

@@ -1,9 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'resultats_screen.dart';
 import 'publish_trip_screen.dart';
 
-class AccueilScreen extends StatelessWidget {
+class AccueilScreen extends StatefulWidget {
   const AccueilScreen({super.key});
+
+  @override
+  State<AccueilScreen> createState() => _AccueilScreenState();
+}
+
+class _AccueilScreenState extends State<AccueilScreen> {
+  // Contrôleur pour gérer et modifier le texte du champ "Départ"
+  final TextEditingController _departController = TextEditingController();
+  bool _isLoadingLocation = false;
+
+  // Fonction pour récupérer la position actuelle (latitude, longitude)
+  Future<void> _determineCurrentCity() async {
+    setState(() {
+      _isLoadingLocation = true;
+    });
+
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _showSnackBar('Les services de localisation sont désactivés.');
+        setState(() => _isLoadingLocation = false);
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          _showSnackBar('Permissions de localisation refusées.');
+          setState(() => _isLoadingLocation = false);
+          return;
+        }
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        _showSnackBar('Permissions refusées définitivement dans les paramètres.');
+        setState(() => _isLoadingLocation = false);
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // On inscrit directement les coordonnées GPS ou une valeur par défaut propre
+      setState(() {
+        _departController.text = "${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}";
+      });
+      
+      _showSnackBar('Position récupérée avec succès !');
+
+    } catch (e) {
+      _showSnackBar('Erreur lors de la géolocalisation : $e');
+    } finally {
+      setState(() {
+        _isLoadingLocation = false;
+      });
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  @override
+  void dispose() {
+    _departController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,10 +202,21 @@ class AccueilScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // Champ Départ
+                  // Champ Départ avec bouton de géolocalisation intégré
                   TextField(
+                    controller: _departController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.location_on, color: Color(0xFF16A34A)),
+                      suffixIcon: _isLoadingLocation
+                          ? Transform.scale(
+                              scale: 0.5,
+                              child: const CircularProgressIndicator(strokeWidth: 3),
+                            )
+                          : IconButton(
+                              icon: const Icon(Icons.my_location, color: Color(0xFF16A34A)),
+                              tooltip: 'Utiliser ma position actuelle',
+                              onPressed: _determineCurrentCity,
+                            ),
                       hintText: 'Départ (ex: Dakar)',
                       hintStyle: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
                       filled: true,
@@ -146,7 +229,7 @@ class AccueilScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   
-                  // Champ Arrivée (Ajouté ici)
+                  // Champ Arrivée
                   TextField(
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.flag, color: Colors.blueAccent),
@@ -241,10 +324,10 @@ class AccueilScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           'Voyagez ensemble, économisez davantage !',
                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
