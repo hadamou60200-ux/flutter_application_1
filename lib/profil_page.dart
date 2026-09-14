@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class ProfilPage extends StatelessWidget {
   const ProfilPage({super.key});
 
-  // Couleur principale SenRide partagée
-  static const Color greenSenRide = Color(0xFF4CAF50);
+  // CORRECTION : même vert que partout ailleurs
+  static const Color greenSenRide = Color(0xFF16A34A);
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +17,10 @@ class ProfilPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Section en-tête du profil
+            // En-tête profil
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 30),
               width: double.infinity,
+              padding: const EdgeInsets.all(24),
               decoration: const BoxDecoration(
                 color: greenSenRide,
                 borderRadius: BorderRadius.only(
@@ -31,95 +31,86 @@ class ProfilPage extends StatelessWidget {
               child: Column(
                 children: [
                   const CircleAvatar(
-                    radius: 50,
+                    radius: 45,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 60, color: greenSenRide),
+                    child: Icon(Icons.person, size: 50, color: greenSenRide),
                   ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    "Utilisateur SenRide",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  const SizedBox(height: 12),
+                  const Text('Ousmane Fall',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
+                  const SizedBox(height: 4),
+                  const Text('ousmane.fall@email.com',
+                      style: TextStyle(color: Colors.white70)),
                   const SizedBox(height: 10),
-                  
-                  // --- SYSTÈMEME DE NOTATION INTÉGRÉ ---
+                  // Note du conducteur
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "4.8",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Row(
-                        children: List.generate(5, (index) {
-                          return Icon(
-                            index < 4 ? Icons.star : Icons.star_half,
-                            color: Colors.amber,
-                            size: 20,
-                          );
-                        }),
-                      ),
-                      const SizedBox(width: 5),
-                      const Text(
-                        "(12 avis)",
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
-                      ),
+                      const Icon(Icons.star, color: Colors.amber, size: 20),
+                      const SizedBox(width: 4),
+                      Text('4.8/5',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      const SizedBox(width: 6),
+                      const Text('(12 avis)',
+                          style: TextStyle(color: Colors.white70)),
                     ],
                   ),
-                  // -------------------------------------
                 ],
               ),
             ),
-            const SizedBox(height: 30),
-
-            // Liste des options du profil
-            _buildOptionTile(
-              Icons.person_outline,
-              "Informations personnelles",
-              () {},
-            ),
-            _buildOptionTile(
-              Icons.history,
-              "Mes trajets",
-              () {},
-            ),
-            _buildOptionTile(
-              Icons.payment,
-              "Paiements",
-              () {},
-            ),
-            _buildOptionTile(
-              Icons.settings,
-              "Paramètres",
-              () {},
-            ),
-
             const SizedBox(height: 20),
 
-            // Bouton de déconnexion
+            // Options
+            _buildOptionTile(
+              icon: Icons.edit,
+              title: 'Modifier le profil',
+              onTap: () {},
+            ),
+            _buildOptionTile(
+              icon: Icons.directions_car,
+              title: 'Mon véhicule',
+              onTap: () {},
+            ),
+            _buildOptionTile(
+              icon: Icons.payment,
+              title: 'Paiements',
+              onTap: () {},
+            ),
+            _buildOptionTile(
+              icon: Icons.notifications,
+              title: 'Notifications',
+              onTap: () {},
+            ),
+            _buildOptionTile(
+              icon: Icons.help,
+              title: 'Aide & Support',
+              onTap: () {},
+            ),
+            const SizedBox(height: 20),
+
+            // Déconnexion
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO : Firebase Auth signOut
+                  },
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  label: const Text('Se déconnecter',
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.redAccent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
-                ),
-                child: const Text(
-                  'Déconnexion',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
             ),
@@ -130,22 +121,23 @@ class ProfilPage extends StatelessWidget {
     );
   }
 
-  // Widget personnalisé pour les options
-  Widget _buildOptionTile(IconData icon, String title, VoidCallback onTap) {
+  Widget _buildOptionTile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Card(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: ListTile(
           leading: Icon(icon, color: greenSenRide),
-          title: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
-          trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          title: Text(title,
+              style: const TextStyle(fontWeight: FontWeight.w500)),
+          trailing: const Icon(Icons.arrow_forward_ios,
+              size: 16, color: Colors.grey),
           onTap: onTap,
         ),
       ),

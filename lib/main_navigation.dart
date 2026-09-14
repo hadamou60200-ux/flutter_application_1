@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/accueil_screen.dart';
-import 'mes_trajets_page.dart'; // Pour importer ta page de trajets
+import 'accueil_screen.dart';
+import 'mes_trajets_page.dart';
 import 'message_page.dart';
 import 'profil_page.dart';
 
@@ -14,45 +14,35 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
 
-  // Liste de tes 4 écrans principaux dans l'ordre exact du menu
-  final List<Widget> _pages = [
-    const AccueilScreen(),
-    const MesTrajetsPage(),
-    const MessagesPage(),
-    const ProfilPage(), // Écran profil avec notation intégré
+  static const Color greenSenRide = Color(0xFF16A34A);
+
+  final List<Widget> _pages = const [
+    AccueilScreen(),
+    MesTrajetsPage(),
+    MessagesPage(),
+    ProfilPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      // CORRECTION : IndexedStack garde l'état de chaque onglet
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.green,
+        selectedItemColor: greenSenRide, // CORRECTION : vert unifié
         unselectedItemColor: Colors.grey,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Accueil',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_car),
-            label: 'Mes trajets',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
+              icon: Icon(Icons.directions_car), label: 'Mes trajets'),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
       ),
     );

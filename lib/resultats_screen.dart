@@ -1,228 +1,181 @@
 import 'package:flutter/material.dart';
-import 'ride_detail_page.dart'; // Import de la page de détails
+import 'ride.dart';
+import 'ride_detail_page.dart';
 
 class ResultatsScreen extends StatelessWidget {
   final String villeDepart;
   final String villeArrivee;
 
-  // On permet de passer les villes recherchées (avec des valeurs par défaut au cas où)
   const ResultatsScreen({
     super.key,
     this.villeDepart = 'Dakar',
     this.villeArrivee = 'Thiès',
   });
 
+  static const Color greenSenRide = Color(0xFF16A34A);
+
   @override
   Widget build(BuildContext context) {
+    // Données de démo — à remplacer par Firestore ensuite
+    final List<Ride> trajets = [
+      Ride(
+        id: '1',
+        departureCity: villeDepart,
+        arrivalCity: villeArrivee,
+        departureTime: DateTime.now().add(const Duration(hours: 3)),
+        price: 2500,
+        availableSeats: 3,
+        driverName: 'Mamadou D.',
+        driverPhone: '221770000000',
+        carModel: 'Toyota RAV4',
+        driverRating: 4.8,
+      ),
+      Ride(
+        id: '2',
+        departureCity: villeDepart,
+        arrivalCity: villeArrivee,
+        departureTime: DateTime.now().add(const Duration(hours: 5)),
+        price: 2500,
+        availableSeats: 2,
+        driverName: 'Fatou Ndoye',
+        driverPhone: '221780000000',
+        carModel: 'Hyundai Tucson',
+        driverRating: 4.6,
+      ),
+      Ride(
+        id: '3',
+        departureCity: villeDepart,
+        arrivalCity: villeArrivee,
+        departureTime: DateTime.now().add(const Duration(hours: 8)),
+        price: 2500,
+        availableSeats: 4,
+        driverName: 'Ibrahima S.',
+        driverPhone: '221760000000',
+        carModel: 'Peugeot 3008',
+        driverRating: 4.9,
+      ),
+    ];
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF16A34A),
-        title: Text(
-          '$villeDepart → $villeArrivee',
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        backgroundColor: greenSenRide,
+        title: Text('$villeDepart → $villeArrivee',
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Column(
-        children: [
-          // Barre de filtre haut dynamique
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.white,
-            child: Row(
-              children: [
-                Chip(
-                  label: const Text('Disponibles'),
-                  backgroundColor: const Color(0xFF16A34A),
-                  labelStyle: const TextStyle(color: Colors.white),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '$villeDepart → $villeArrivee',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.filter_list),
-                  onPressed: () {
-                    // Optionnel : Action pour les filtres futurs
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Liste des trajets disponibles
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _TrajetCard(
-                  nom: 'Mamadou D.',
-                  note: '4.8 (125)',
-                  trajet: '$villeDepart → $villeArrivee',
-                  voiture: 'Toyota RAV4',
-                  places: '3 places restantes',
-                  prix: '2 500 FCFA',
-                ),
-                const SizedBox(height: 12),
-                _TrajetCard(
-                  nom: 'Fatou Ndoye',
-                  note: '4.6 (98)',
-                  trajet: '$villeDepart → $villeArrivee',
-                  voiture: 'Hyundai Tucson',
-                  places: '2 places restantes',
-                  prix: '2 500 FCFA',
-                ),
-                const SizedBox(height: 12),
-                _TrajetCard(
-                  nom: 'Ibrahima S.',
-                  note: '4.9 (210)',
-                  trajet: '$villeDepart → $villeArrivee',
-                  voiture: 'Peugeot 3008',
-                  places: '4 places restantes',
-                  prix: '2 500 FCFA',
-                ),
-              ],
-            ),
-          ),
-        ],
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: trajets.length,
+        itemBuilder: (context, index) =>
+            _TrajetCard(ride: trajets[index]),
       ),
     );
   }
 }
 
-// Widget pour une carte de trajet individuelle
 class _TrajetCard extends StatelessWidget {
-  final String nom;
-  final String note;
-  final String trajet;
-  final String voiture;
-  final String places;
-  final String prix;
+  final Ride ride;
+  const _TrajetCard({required this.ride});
 
-  const _TrajetCard({
-    required this.nom,
-    required this.note,
-    required this.trajet,
-    required this.voiture,
-    required this.places,
-    required this.prix,
-  });
+  static const Color greenSenRide = Color(0xFF16A34A);
+
+  void _ouvrirDetails(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RideDetailPage(ride: ride)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        // Navigation vers la page de détails au clic sur la carte
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RideDetailPage(
-              rideData: {
-                'depart': trajet.split('→')[0].trim(),
-                'arrivee': trajet.split('→')[1].trim(),
-                'prix': prix,
-                'conducteur': nom,
-                'telephone': '221770000000',
-              },
-            ),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Ligne du haut : Infos conducteur & Note
-            Row(
-              children: [
-                const CircleAvatar(
-                  backgroundColor: Color(0xFFE2E8F0), // Correction de la couleur
-                  child: Icon(Icons.person, color: Colors.grey),
-                ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(nom, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 16),
-                        const SizedBox(width: 4),
-                        Text(note, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const Divider(height: 20),
-            
-            // Ligne du milieu : Trajet et Voiture
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(trajet, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    const SizedBox(height: 4),
-                    Text('$voiture • $places', style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(prix, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF16A34A))),
-                    const SizedBox(height: 6),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Action de réservation directe ou redirection détails
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RideDetailPage(
-                              rideData: {
-                                'depart': trajet.split('→')[0].trim(),
-                                'arrivee': trajet.split('→')[1].trim(),
-                                'prix': prix,
-                                'conducteur': nom,
-                                'telephone': '221770000000',
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF16A34A),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        elevation: 0,
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: () => _ouvrirDetails(context),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Color(0xFFE2E8F0),
+                    child: Icon(Icons.person, color: Colors.grey),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(ride.driverName,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Row(
+                        children: [
+                          const Icon(Icons.star,
+                              color: Colors.amber, size: 16),
+                          const SizedBox(width: 4),
+                          Text('${ride.driverRating ?? "-"}',
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 13)),
+                        ],
                       ),
-                      child: const Text('Réserver', style: TextStyle(color: Colors.white)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                    ],
+                  ),
+                ],
+              ),
+              const Divider(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${ride.departureCity} → ${ride.arrivalCity}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${ride.carModel ?? "Véhicule"} • ${ride.availableSeats} places',
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('${ride.price} FCFA',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: greenSenRide)),
+                      const SizedBox(height: 6),
+                      ElevatedButton(
+                        onPressed: () => _ouvrirDetails(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: greenSenRide,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                          elevation: 0,
+                        ),
+                        child: const Text('Réserver',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

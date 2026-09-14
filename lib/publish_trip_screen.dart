@@ -14,99 +14,107 @@ class _PublishTripScreenState extends State<PublishTripScreen> {
   final _placesController = TextEditingController();
   DateTime? _selectedDate;
 
+  static const Color greenSenRide = Color(0xFF16A34A);
+
+  @override
+  void dispose() {
+    _departController.dispose();
+    _arriveeController.dispose();
+    _prixController.dispose();
+    _placesController.dispose();
+    super.dispose();
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void _publier() {
+    final depart = _departController.text.trim();
+    final arrivee = _arriveeController.text.trim();
+    final prix = int.tryParse(_prixController.text.trim());
+    final places = int.tryParse(_placesController.text.trim());
+
+    if (depart.isEmpty || arrivee.isEmpty) {
+      _showSnackBar('Renseigne les villes de départ et d\'arrivée.');
+      return;
+    }
+    if (_selectedDate == null) {
+      _showSnackBar('Choisis une date de départ.');
+      return;
+    }
+    if (places == null || places < 1 || places > 8) {
+      _showSnackBar('Nombre de places invalide (1 à 8).');
+      return;
+    }
+    if (prix == null || prix <= 0) {
+      _showSnackBar('Prix invalide.');
+      return;
+    }
+
+    // TODO: Enregistrer le trajet dans Firebase Firestore
+    _showSnackBar('Trajet validé avec succès !');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Publier un trajet'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: greenSenRide,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: ListView(
           children: [
-            // Point de départ
             TextField(
               controller: _departController,
               decoration: const InputDecoration(
-                labelText: 'Ville de départ (ex: Dakar)',
-                prefixIcon: Icon(Icons.location_on),
-                border: OutlineInputBorder(),
+                labelText: 'Ville de départ',
+                prefixIcon: Icon(Icons.location_on, color: greenSenRide),
               ),
             ),
             const SizedBox(height: 16),
-            
-            // Destination
             TextField(
               controller: _arriveeController,
               decoration: const InputDecoration(
-                labelText: 'Ville d\'arrivée (ex: Saint-Louis)',
-                prefixIcon: Icon(Icons.flag),
-                border: OutlineInputBorder(),
+                labelText: 'Ville d\'arrivée',
+                prefixIcon: Icon(Icons.flag, color: greenSenRide),
               ),
             ),
             const SizedBox(height: 16),
-            
-            // Date du trajet
-            OutlinedButton.icon(
-              onPressed: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 60)),
-                );
-                if (date != null) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                }
-              },
-              icon: const Icon(Icons.calendar_today),
-              label: Text(_selectedDate == null
-                  ? 'Date du départ'
-                  : 'Date : ${_selectedDate.toString().split(' ')[0]}'),
-            ),
-            const SizedBox(height: 16),
-            
-            // Nombre de places
             TextField(
               controller: _placesController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: 'Nombre de places disponibles',
-                prefixIcon: Icon(Icons.airline_seat_recline_normal),
-                border: OutlineInputBorder(),
+                labelText: 'Nombre de places (1-8)',
+                prefixIcon: Icon(Icons.person, color: greenSenRide),
               ),
             ),
             const SizedBox(height: 16),
-            
-            // Prix par place (en FCFA)
             TextField(
               controller: _prixController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: 'Prix par place (ex: 5000 FCFA)',
-                prefixIcon: Icon(Icons.money),
-                border: OutlineInputBorder(),
+                labelText: 'Prix par place (FCFA)',
+                prefixIcon: Icon(Icons.money, color: greenSenRide),
               ),
             ),
             const SizedBox(height: 24),
-            
-            // Bouton de validation
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: greenSenRide,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              onPressed: () {
-                // Pour l'instant, on affiche juste les infos dans la console
-                print('Trajet publié : ${_departController.text} -> ${_arriveeController.text}');
-              },
-              child: const Text('Mettre en ligne le trajet', style: TextStyle(fontSize: 16)),
+              onPressed: _publier,
+              child: const Text(
+                'Publier le trajet',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),

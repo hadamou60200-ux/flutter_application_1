@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'accueil_page.dart';
+import 'accueil_screen.dart';
 import 'register_page.dart';
 import 'package:flutter_application_1/main_navigation.dart';
 
