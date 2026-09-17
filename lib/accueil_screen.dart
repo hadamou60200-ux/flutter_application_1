@@ -29,6 +29,10 @@ class _AccueilScreenState extends State<AccueilScreen> {
   final TextEditingController _departController = TextEditingController();
   final TextEditingController _arriveeController = TextEditingController();
   bool _isLoadingLocation = false;
+  
+  // Date et heure sélectionnées pour le voyage
+  DateTime _selectedDate = DateTime.now();
+  TimeOfDay _selectedTime = TimeOfDay.now();
 
   @override
   void dispose() {
@@ -40,6 +44,61 @@ class _AccueilScreenState extends State<AccueilScreen> {
   void _message(String text) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  // Fonction pour ouvrir le calendrier
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: SenRideColors.green,
+              onPrimary: Colors.white,
+              surface: SenRideColors.card,
+              onSurface: Colors.white,
+            ),
+            dialogBackgroundColor: SenRideColors.background,
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  // Fonction pour ouvrir le sélecteur d'heure
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime,
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: SenRideColors.green,
+              onPrimary: Colors.white,
+              surface: SenRideColors.card,
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+      });
+    }
   }
 
   Future<void> _determineCurrentCity() async {
@@ -84,12 +143,23 @@ class _AccueilScreenState extends State<AccueilScreen> {
       _message('Veuillez renseigner le départ et l\'arrivée.');
       return;
     }
+
+    // Combiner la date et l'heure sélectionnées si besoin
+    final DateTime dateTimeVoyage = DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+      _selectedTime.hour,
+      _selectedTime.minute,
+    );
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ResultatsScreen(
           villeDepart: _departController.text.trim(),
           villeArrivee: _arriveeController.text.trim(),
+          dateVoyage: dateTimeVoyage, // On transmet la date et l'heure combinées
         ),
       ),
     );
@@ -107,11 +177,15 @@ class _AccueilScreenState extends State<AccueilScreen> {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 Transform.translate(
-                  offset: const Offset(0, -22),
+                  offset: const Offset(0, -15),
                   child: _SearchPanel(
                     departController: _departController,
                     arriveeController: _arriveeController,
                     loadingLocation: _isLoadingLocation,
+                    selectedDate: _selectedDate,
+                    selectedTime: _selectedTime,
+                    onTapDate: () => _selectDate(context),
+                    onTapTime: () => _selectTime(context),
                     onLocation: _determineCurrentCity,
                     onSearch: _rechercher,
                     onPublish: () => Navigator.push(
@@ -136,13 +210,11 @@ class _AccueilScreenState extends State<AccueilScreen> {
 
   Widget _buildHero() {
     return SizedBox(
-      height: 248,
+      height: 215,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Photo de la Corniche de Dakar (déclare assets/dakar-corniche.jpg dans pubspec.yaml)
-          Image.asset('assets/dakar-corniche.jpg', fit: BoxFit.cover),
-          // Voile dégradé pour la lisibilité
+          Image.asset('assets/images/dakar-corniche.png', fit: BoxFit.cover),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -158,7 +230,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 22),
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -223,7 +295,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.4)),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 3),
                   const Text.rich(
                     TextSpan(children: [
                       TextSpan(text: 'Où partez-vous\n'),
@@ -233,7 +305,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
                     ]),
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 30,
+                        fontSize: 26,
                         height: 1.03,
                         fontWeight: FontWeight.w800),
                   ),
@@ -247,33 +319,43 @@ class _AccueilScreenState extends State<AccueilScreen> {
   }
 }
 
-/// Drapeau du Sénégal (vert / jaune-étoile / rouge).
+/// Drapeau du Sénégal parfaitement visible (Vert / Jaune avec étoile / Rouge)
 class SenegalFlag extends StatelessWidget {
   const SenegalFlag({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(2),
-      child: SizedBox(
-        width: 29,
-        height: 18,
-        child: Row(children: [
-          const Expanded(child: ColoredBox(color: SenRideColors.flagGreen)),
-          Expanded(
-            child: ColoredBox(
-              color: SenRideColors.yellow,
-              child: Center(
-                child: Transform.scale(
-                  scale: .72,
-                  child: const Icon(Icons.star,
-                      size: 12, color: SenRideColors.flagGreen),
+    return Container(
+      width: 42,
+      height: 26,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: Colors.white24, width: 0.5),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(3.5),
+        child: Row(
+          children: [
+            Expanded(
+              child: Container(color: SenRideColors.flagGreen),
+            ),
+            Expanded(
+              child: Container(
+                color: SenRideColors.yellow,
+                child: const Center(
+                  child: Icon(
+                    Icons.star,
+                    size: 11,
+                    color: SenRideColors.flagGreen,
+                  ),
                 ),
               ),
             ),
-          ),
-          const Expanded(child: ColoredBox(color: SenRideColors.flagRed)),
-        ]),
+            Expanded(
+              child: Container(color: SenRideColors.flagRed),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -283,6 +365,10 @@ class _SearchPanel extends StatelessWidget {
   final TextEditingController departController;
   final TextEditingController arriveeController;
   final bool loadingLocation;
+  final DateTime selectedDate;
+  final TimeOfDay selectedTime;
+  final VoidCallback onTapDate;
+  final VoidCallback onTapTime;
   final VoidCallback onLocation;
   final VoidCallback onSearch;
   final VoidCallback onPublish;
@@ -291,10 +377,23 @@ class _SearchPanel extends StatelessWidget {
     required this.departController,
     required this.arriveeController,
     required this.loadingLocation,
+    required this.selectedDate,
+    required this.selectedTime,
+    required this.onTapDate,
+    required this.onTapTime,
     required this.onLocation,
     required this.onSearch,
     required this.onPublish,
   });
+
+  String _formatDate(DateTime date) {
+    final days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    final months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+    
+    final dayString = days[date.weekday - 1];
+    final monthString = months[date.month - 1];
+    return '$dayString ${date.day} $monthString';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -345,6 +444,108 @@ class _SearchPanel extends StatelessWidget {
           hint: 'Saint-Louis — Centre',
           color: SenRideColors.green,
         ),
+        const SizedBox(height: 12),
+        
+        // --- LIGNE DATE ET HEURE ---
+        Row(
+          children: [
+            // Sélecteur de Date
+            Expanded(
+              child: InkWell(
+                onTap: onTapDate,
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: SenRideColors.field,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: SenRideColors.yellow.withValues(alpha: .12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.calendar_month_outlined, color: SenRideColors.yellow, size: 18),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('DATE',
+                                style: TextStyle(
+                                    color: SenRideColors.yellow,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 2),
+                            Text(
+                              _formatDate(selectedDate),
+                              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Sélecteur d'Heure
+            Expanded(
+              child: InkWell(
+                onTap: onTapTime,
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: SenRideColors.field,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: SenRideColors.aqua.withValues(alpha: .12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.access_time, color: SenRideColors.aqua, size: 18),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('HEURE',
+                                style: TextStyle(
+                                    color: SenRideColors.aqua,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700)),
+                            const SizedBox(height: 2),
+                            Text(
+                              selectedTime.format(context),
+                              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        // ---------------------------------------
+
         const SizedBox(height: 14),
         Row(children: [
           Expanded(
@@ -465,8 +666,6 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-/// Cartes de trajets populaires (données de démonstration).
-/// Remplace par Firestore quand tu actives Firebase.
 class _PopularRidesPlaceholder extends StatelessWidget {
   final VoidCallback onSearch;
   const _PopularRidesPlaceholder({required this.onSearch});
