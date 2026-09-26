@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // <--- Import indispensable
 
 class ProfilPage extends StatelessWidget {
   const ProfilPage({super.key});
@@ -100,8 +101,11 @@ class ProfilPage extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO : Firebase Auth signOut
+                  onPressed: () async {
+                    // Déconnexion de Firebase Auth
+                    await FirebaseAuth.instance.signOut();
+                    // Grâce au StreamBuilder dans le main.dart, 
+                    // l'application basculera automatiquement sur le LoginScreen.
                   },
                   icon: const Icon(Icons.logout, color: Colors.white),
                   label: const Text('Se déconnecter',

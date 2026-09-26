@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // <--- Ajouté
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase_options.dart'; // généré par flutterfire configure
 import 'main_navigation.dart';
+import 'login_screen.dart'; // <--- Ajouté
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +42,28 @@ class SenRideApp extends StatelessWidget {
         Locale('en', 'US'),
       ],
       locale: const Locale('fr', 'FR'),
-      home: const MainNavigation(),
+      // Vérification en temps réel de l'état de connexion de l'utilisateur
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          // Pendant que Firebase vérifie la session en cache
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(color: Color(0xFF16A34A)),
+              ),
+            );
+          }
+
+          // Si l'utilisateur est connecté, on affiche l'application principale
+          if (snapshot.hasData) {
+            return const MainNavigation();
+          }
+
+          // Sinon, on affiche l'écran de connexion / inscription
+          return const LoginScreen();
+        },
+      ),
     );
   }
 }

@@ -90,6 +90,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
         builder: (context) => ResultatsScreen(
           villeDepart: _departController.text.trim(),
           villeArrivee: _arriveeController.text.trim(),
+          dateVoyage: DateTime.now(), // Ajouté pour correspondre au paramètre requis
         ),
       ),
     );
@@ -125,7 +126,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
                 const SizedBox(height: 18),
                 const _SectionTitle(title: 'Trajets populaires'),
                 const SizedBox(height: 12),
-                _PopularRidesPlaceholder(onSearch: _rechercher),
+                const _PopularRidesSection(),
               ]),
             ),
           ),
@@ -140,9 +141,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Photo de la Corniche de Dakar avec le bon chemin vers le dossier assets/images/
           Image.asset('assets/images/dakar-corniche.jpg', fit: BoxFit.cover),
-          // Voile dégradé pour la lisibilité
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -465,9 +464,8 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-class _PopularRidesPlaceholder extends StatelessWidget {
-  final VoidCallback onSearch;
-  const _PopularRidesPlaceholder({required this.onSearch});
+class _PopularRidesSection extends StatelessWidget {
+  const _PopularRidesSection();
 
   static const _rides = [
     _DemoRide('Dakar', 'Saint-Louis', '14:00', '4 places', '3 500 FCFA'),
@@ -478,9 +476,24 @@ class _PopularRidesPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: _rides
-          .map((r) => _PopularRideCard(ride: r, onTap: onSearch))
-          .toList(),
+      children: _rides.map((r) {
+        return _PopularRideCard(
+          ride: r,
+          onTap: () {
+            // Lance directement la recherche pour ce trajet populaire
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultatsScreen(
+                  villeDepart: r.from,
+                  villeArrivee: r.to,
+                  dateVoyage: DateTime.now(),
+                ),
+              ),
+            );
+          },
+        );
+      }).toList(),
     );
   }
 }
