@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // <-- Ajouté
 
 // Tes couleurs SenRide
 class SenRideColors {
@@ -24,6 +25,7 @@ class _PublishTripScreenState extends State<PublishTripScreen> {
   final _arriveeController = TextEditingController();
   final _prixController = TextEditingController();
   final _placesController = TextEditingController();
+  final _phoneController = TextEditingController(); // <-- Ajouté pour le téléphone WhatsApp
   
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
@@ -34,6 +36,7 @@ class _PublishTripScreenState extends State<PublishTripScreen> {
     _arriveeController.dispose();
     _prixController.dispose();
     _placesController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -88,9 +91,17 @@ class _PublishTripScreenState extends State<PublishTripScreen> {
     final arrivee = _arriveeController.text.trim();
     final prix = int.tryParse(_prixController.text.trim());
     final places = int.tryParse(_placesController.text.trim());
+    final phone = _phoneController.text.trim();
 
-    if (depart.isEmpty || arrivee.isEmpty || _selectedDate == null || _selectedTime == null || places == null || prix == null) {
+    if (depart.isEmpty || arrivee.isEmpty || phone.isEmpty || _selectedDate == null || _selectedTime == null || places == null || prix == null) {
       _showSnackBar('Veuillez remplir tous les champs correctement.');
+      return;
+    }
+
+    // Récupérer l'utilisateur connecté
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _showSnackBar('Veuillez vous connecter pour publier un trajet.');
       return;
     }
 
@@ -101,10 +112,14 @@ class _PublishTripScreenState extends State<PublishTripScreen> {
 
     try {
       await FirebaseFirestore.instance.collection('trajets').add({
+        'driverId': user.uid, // <-- Indispensable pour la sécurité anti-auto-réservation
+        'driverName': user.displayName ?? 'Conducteur SenRide',
+        'driverPhone': phone,
         'villeDepart': depart,
         'villeArrivee': arrivee,
         'dateHeureDepart': Timestamp.fromDate(dateTimeVoyage),
         'places': places,
+        'availableSeats': places, // Synchronisé pour la gestion des réservations
         'prix': prix,
         'createdAt': FieldValue.serverTimestamp(),
       });
@@ -119,7 +134,7 @@ class _PublishTripScreenState extends State<PublishTripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: SenRideColors.background, // Fond uniforme de l'accueil
+      backgroundColor: SenRideColors.background,
       appBar: AppBar(
         title: const Text('Publier un trajet', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: SenRideColors.card,
@@ -189,6 +204,8 @@ class _PublishTripScreenState extends State<PublishTripScreen> {
             _buildTextField(controller: _placesController, label: 'Nombre de places (1-8)', icon: Icons.person, color: SenRideColors.yellow, isNumber: true),
             const SizedBox(height: 16),
             _buildTextField(controller: _prixController, label: 'Prix par place (FCFA)', icon: Icons.money, color: SenRideColors.green, isNumber: true),
+            const SizedBox(height: 16),
+            _buildTextField(controller: _phoneController, label: 'Téléphone WhatsApp (ex: 221770000000)', icon: Icons.phone, color: SenRideColors.aqua, isNumber: true),
             const SizedBox(height: 24),
             
             ElevatedButton(

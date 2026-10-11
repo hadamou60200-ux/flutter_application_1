@@ -14,6 +14,7 @@ class MesTrajetsPage extends StatelessWidget {
     final List<Ride> trajetsEnCours = [
       Ride(
         id: '1',
+        driverId: 'demo_driver_1', // <-- Ajouté ici
         departureCity: 'Dakar',
         arrivalCity: 'Thiès',
         departureTime: DateTime.now().add(const Duration(days: 1)),
@@ -29,6 +30,7 @@ class MesTrajetsPage extends StatelessWidget {
     final List<Ride> historiqueTrajets = [
       Ride(
         id: '2',
+        driverId: 'demo_driver_2', // <-- Ajouté ici
         departureCity: 'Saint-Louis',
         arrivalCity: 'Dakar',
         departureTime: DateTime.now().subtract(const Duration(days: 7)),
@@ -73,7 +75,6 @@ class MesTrajetsPage extends StatelessWidget {
     );
   }
 
-  // CORRECTION : code de liste factorisé (plus de duplication)
   Widget _buildRideList(
       BuildContext context, List<Ride> rides, String emptyMessage) {
     if (rides.isEmpty) return Center(child: Text(emptyMessage));
@@ -88,7 +89,10 @@ class MesTrajetsPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RideDetailPage(ride: ride),
+                builder: (context) => RideDetailPage(
+                  ride: ride,
+                  rideId: ride.id,
+                ),
               ),
             );
           },

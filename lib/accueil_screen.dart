@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'resultats_screen.dart';
 import 'publish_trip_screen.dart';
+import 'notification_service.dart'; // Importation du service de notification
+import 'notifications_screen.dart'; // Importation de l'écran des notifications
 
 /// Couleurs du thème SenRide "Aquatic Immersion".
 class SenRideColors {
@@ -33,6 +35,14 @@ class _AccueilScreenState extends State<AccueilScreen> {
   // Date et heure sélectionnées pour le voyage
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialisation des notifications FCM et écoute en temps réel dès l'arrivée sur l'accueil
+    NotificationService.instance.initializeFCM();
+    NotificationService.instance.listenToReservationUpdates(context);
+  }
 
   @override
   void dispose() {
@@ -144,7 +154,6 @@ class _AccueilScreenState extends State<AccueilScreen> {
       return;
     }
 
-    // Combiner la date et l'heure sélectionnées si besoin
     final DateTime dateTimeVoyage = DateTime(
       _selectedDate.year,
       _selectedDate.month,
@@ -159,7 +168,7 @@ class _AccueilScreenState extends State<AccueilScreen> {
         builder: (context) => ResultatsScreen(
           villeDepart: _departController.text.trim(),
           villeArrivee: _arriveeController.text.trim(),
-          dateVoyage: dateTimeVoyage, // On transmet la date et l'heure combinées
+          dateVoyage: dateTimeVoyage,
         ),
       ),
     );
@@ -281,7 +290,13 @@ class _AccueilScreenState extends State<AccueilScreen> {
                         ),
                         child: IconButton(
                           tooltip: 'Notifications',
-                          onPressed: () => _message('Aucune nouvelle notification.'),
+                          // MODIFICATION ICI : Ouvre l'écran des notifications
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const NotificationsScreen(),
+                            ),
+                          ),
                           icon: const Icon(Icons.notifications_none,
                               color: Colors.white, size: 21),
                         ),
@@ -449,7 +464,6 @@ class _SearchPanel extends StatelessWidget {
         // --- LIGNE DATE ET HEURE ---
         Row(
           children: [
-            // Sélecteur de Date
             Expanded(
               child: InkWell(
                 onTap: onTapDate,
@@ -496,7 +510,6 @@ class _SearchPanel extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            // Sélecteur d'Heure
             Expanded(
               child: InkWell(
                 onTap: onTapTime,
@@ -544,7 +557,6 @@ class _SearchPanel extends StatelessWidget {
             ),
           ],
         ),
-        // ---------------------------------------
 
         const SizedBox(height: 14),
         Row(children: [

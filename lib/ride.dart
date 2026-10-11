@@ -1,5 +1,6 @@
 class Ride {
   final String id;
+  final String driverId; // <-- Ajouté pour identifier le propriétaire du trajet
   final String departureCity;
   final String arrivalCity;
   final DateTime departureTime;
@@ -14,6 +15,7 @@ class Ride {
 
   Ride({
     required this.id,
+    required this.driverId, // <-- Requis
     required this.departureCity,
     required this.arrivalCity,
     required this.departureTime,
@@ -27,10 +29,11 @@ class Ride {
     this.isBooked = false,
   });
 
-  // Optionnel : Factory pour Firestore
+  // Factory pour Firestore
   factory Ride.fromMap(String id, Map<String, dynamic> map) {
     return Ride(
       id: id,
+      driverId: map['driverId'] ?? '', // <-- Récupération depuis Firestore
       departureCity: map['departureCity'] ?? '',
       arrivalCity: map['arrivalCity'] ?? '',
       departureTime: map['departureTime'] != null 
@@ -49,6 +52,7 @@ class Ride {
 
   Map<String, dynamic> toMap() {
     return {
+      'driverId': driverId, // <-- Sauvegarde dans Firestore
       'departureCity': departureCity,
       'arrivalCity': arrivalCity,
       'departureTime': departureTime,

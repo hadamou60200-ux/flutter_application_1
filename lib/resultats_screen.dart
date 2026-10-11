@@ -41,7 +41,6 @@ class ResultatsScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
       ),
-      // Utilisation d'un StreamBuilder pour écouter Firestore en temps réel
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('trajets')
@@ -79,12 +78,13 @@ class ResultatsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final data = docs[index].data() as Map<String, dynamic>;
               
-              // Conversion sécurisée des données Firestore vers ton modèle Ride
+              // Conversion sécurisée des données Firestore vers votre modèle Ride
               final Timestamp? timestamp = data['dateHeureDepart'];
               final DateTime departureDateTime = timestamp?.toDate() ?? DateTime.now();
 
               final ride = Ride(
                 id: docs[index].id,
+                driverId: data['driverId'] ?? '',
                 departureCity: data['villeDepart'] ?? '',
                 arrivalCity: data['villeArrivee'] ?? '',
                 departureTime: departureDateTime,
@@ -114,13 +114,17 @@ class _TrajetCard extends StatelessWidget {
   void _ouvrirDetails(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => RideDetailPage(ride: ride)),
+      MaterialPageRoute(
+        builder: (context) => RideDetailPage(
+          ride: ride,
+          rideId: ride.id,
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Formatage de l'heure de départ (ex: 14:30)
     final String heureFormatee = '${ride.departureTime.hour.toString().padLeft(2, '0')}:${ride.departureTime.minute.toString().padLeft(2, '0')}';
 
     return Card(
@@ -128,7 +132,7 @@ class _TrajetCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0x33FFFFFF)), // Bordure discrète
+        side: const BorderSide(color: Color(0x33FFFFFF)),
       ),
       child: InkWell(
         onTap: () => _ouvrirDetails(context),
